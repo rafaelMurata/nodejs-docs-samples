@@ -19,7 +19,7 @@
  * List all findings under a given parent resource.
  */
 function main(organizationId, location = 'global') {
-  // [START securitycenter_list_all_findings_v2]
+  // [START securitycenter_list_findings_v2]
   // Imports the Google Cloud client library.
   const {SecurityCenterClient} = require('@google-cloud/security-center').v2;
 
@@ -54,7 +54,7 @@ function main(organizationId, location = 'global') {
   }
 
   listAllFindings();
-  // [END securitycenter_list_all_findings_v2]
+  // [END securitycenter_list_findings_v2]
 }
 
 main(...process.argv.slice(2));
