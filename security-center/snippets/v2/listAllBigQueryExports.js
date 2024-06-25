@@ -59,9 +59,9 @@ function main(organizationId, location = 'global') {
       listBigQueryExportsRequest
     );
     let count = 0;
-
+    console.log('Sources:');
     for await (const response of iterable) {
-      console.log(`${++count} ${response.name}`);
+      console.log(`${++count} ${response.name} ${response.description}`);
     }
   }
 

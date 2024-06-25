@@ -53,7 +53,7 @@ function main(organizationId, location = 'global') {
     // Call the API.
     const iterable = client.listFindingsAsync(listFilteredFindingsRequest);
     let count = 0;
-
+    console.log('Findings:');
     for await (const response of iterable) {
       console.log(
         `${++count} ${response.finding.name} ${response.finding.resourceName}`

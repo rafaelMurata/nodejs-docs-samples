@@ -58,29 +58,20 @@ describe('Client with mute rule V2', async () => {
       muteConfigName: muteConfigResponse.name,
       untouchedMuteConfigName: '',
     };
-    console.log('my data %j', data);
-  });
-
-  after(async () => {
-    const client = new SecurityCenterClient();
-
-    const name = `organizations/${organizationId}/locations/${location}/muteConfigs/${data.muteConfigId}`;
-    await client
-      .deleteMuteConfig({name: name})
-      .catch(error => console.error(error));
+    console.log('my data muteConfig %j', data);
   });
 
   it('client can create mute rule V2', () => {
     const output = exec(`node v2/createMuteRule.js ${data.orgId}`);
-    assert.match(output, new RegExp(data.orgId));
+    assert(output.includes(data.orgId));
     assert.match(output, /New mute rule config created/);
     assert.notMatch(output, /undefined/);
   });
 
   it('client can list all mute rules V2', () => {
     const output = exec(`node v2/listAllMuteRules.js ${data.orgId}`);
-    assert.match(output, new RegExp(data.orgId));
-    assert.match(output, new RegExp(data.untouchedMuteConfigName));
+    assert(output.includes(data.orgId));
+    assert(output.includes(data.untouchedMuteConfigName));
     assert.notMatch(output, /undefined/);
   });
 
@@ -88,7 +79,7 @@ describe('Client with mute rule V2', async () => {
     const output = exec(
       `node v2/getMuteRule.js ${data.orgId} ${data.muteConfigId}`
     );
-    assert.match(output, new RegExp(data.muteConfigName));
+    assert(output.includes(data.muteConfigName));
     assert.match(output, /Get mute rule config/);
     assert.notMatch(output, /undefined/);
   });
