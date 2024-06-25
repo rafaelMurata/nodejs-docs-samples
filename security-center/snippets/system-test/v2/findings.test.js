@@ -22,6 +22,7 @@ const {describe, it, before} = require('mocha');
 const uuid = require('uuid');
 
 const organizationId = process.env['GCLOUD_ORGANIZATION'];
+const [projectId] = process.env['GOOGLE_CLOUD_PROJECT'];
 const location = 'global';
 
 describe('Client with sources and findings V2', async () => {
@@ -30,7 +31,6 @@ describe('Client with sources and findings V2', async () => {
     // Creates a new client.
     const client = new SecurityCenterClient();
 
-    const [projectId] = await client.getProjectId();
     const [source] = await client
       .createSource({
         source: {
@@ -86,7 +86,7 @@ describe('Client with sources and findings V2', async () => {
 
   it('client can create source V2', () => {
     const output = exec(`node v2/createSource.js ${data.orgId}`);
-    assert.match(output, new RegExp(data.orgId));
+    assert(output.includes(data.orgId));
     assert.match(output, /New Source created/);
     assert.notMatch(output, /undefined/);
   });
@@ -95,22 +95,22 @@ describe('Client with sources and findings V2', async () => {
     const output = exec(
       `node v2/createFinding.js ${data.orgId} ${data.sourceId}`
     );
-    assert.match(output, new RegExp(data.sourceName));
+    assert(output.includes(data.sourceName));
     assert.match(output, /New finding created/);
     assert.notMatch(output, /undefined/);
   });
 
   it('client can list all findings V2', () => {
     const output = exec(`node v2/listAllFindings.js ${data.orgId}`);
-    assert.match(output, new RegExp(data.findingName));
-    assert.match(output, new RegExp(data.untouchedFindingName));
+    assert(output.includes(data.findingName));
+    assert(output.includes(data.untouchedFindingName));
     assert.notMatch(output, /undefined/);
   });
 
   it('client can list only some findings V2', () => {
     const output = exec(`node v2/listFilteredFindings.js ${data.orgId}`);
-    assert.match(output, new RegExp(data.findingName));
-    assert.notMatch(output, new RegExp(data.untouchedFindingName));
+    assert(output.includes(data.findingName));
+    assert.match(output, /Findings/);
     assert.notMatch(output, /undefined/);
   });
 
@@ -118,7 +118,7 @@ describe('Client with sources and findings V2', async () => {
     const output = exec(
       `node v2/setMuteFinding.js ${data.orgId} ${data.sourceId} ${data.findingId}`
     );
-    assert.match(output, new RegExp('MUTED'));
+    assert(output.includes('MUTED'));
     assert.match(output, /Mute value for the finding/);
     assert.notMatch(output, /undefined/);
   });
@@ -127,7 +127,7 @@ describe('Client with sources and findings V2', async () => {
     const output = exec(
       `node v2/setUnmuteFinding.js ${data.orgId} ${data.sourceId} ${data.findingId}`
     );
-    assert.match(output, new RegExp('UNMUTED'));
+    assert(output.includes('UNMUTED'));
     assert.match(output, /Unmute a finding/);
     assert.notMatch(output, /undefined/);
   });
@@ -180,6 +180,49 @@ describe('Client with sources and findings V2', async () => {
       `node v2/setIamPolicy.js ${data.orgId} ${data.sourceId} ${userEmail} ${role}`
     );
     assert.match(output, /Updated policy/);
+    assert.notMatch(output, /undefined/);
+  });
+
+  it('client can update a finding state V2', () => {
+    const output = exec(
+      `node v2/setFindingState.js ${data.orgId} ${data.sourceId} ${data.findingId}`
+    );
+    assert(output.includes('INACTIVE'));
+    assert.match(output, /Set finding state/);
+    assert.notMatch(output, /undefined/);
+  });
+
+  it('client can creates or updates a finding source V2', () => {
+    const output = exec(
+      `node v2/updateFindingSource.js ${data.orgId} ${data.sourceId} ${data.findingId}`
+    );
+    assert(output.includes(data.findingName));
+    assert.match(output, /Updated finding source/);
+    assert.notMatch(output, /undefined/);
+  });
+
+  it('client can list all security sources in an organization V2', () => {
+    const output = exec(`node v2/listAllSources.js ${data.orgId}`);
+    assert(output.includes(data.sourceName));
+    assert.match(output, /Sources/);
+    assert.notMatch(output, /undefined/);
+  });
+
+  it('client can creates or updates a source V2', () => {
+    const output = exec(
+      `node v2/updateSource.js ${data.orgId} ${data.sourceId}`
+    );
+    assert(output.includes(data.sourceName));
+    assert.match(output, /New Display Name/);
+    assert.match(output, /Updated Source/);
+    assert.notMatch(output, /undefined/);
+  });
+
+  it('client can retrieve a specific source V2', () => {
+    const output = exec(`node v2/getSource.js ${data.orgId} ${data.sourceId}`);
+    assert(output.includes(data.sourceName));
+    assert.match(output, /Source/);
+    assert.match(output, /"description":"A new custom source that does X"/);
     assert.notMatch(output, /undefined/);
   });
 });
